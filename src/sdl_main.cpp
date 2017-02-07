@@ -58,20 +58,38 @@ SDL_Surface* loadImageToSurface(const char* imageFilePath)
     SDL_Surface* loadedSurface = IMG_Load(imageFilePath);
     if(loadedSurface == NULL)
     {
-        printf( "Unable to load image %s! SDL_image Error: %s\n", imageFilePath, IMG_GetError() );
+        printf("Unable to load image %s! SDL_image Error: %s\n", imageFilePath, IMG_GetError());
     }
     else
     {
-        optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, NULL );
+        optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, NULL);
         if( optimizedSurface == NULL )
         {
-            printf( "Unable to optimize image %s! SDL Error: %s\n", imageFilePath, SDL_GetError() );
+            printf("Unable to optimize image %s! SDL Error: %s\n", imageFilePath, SDL_GetError());
         }
-        
+        else
+        {
+            printf("Successdully optimezed image %s with %d Bytes Per Pixel\n", imageFilePath, optimizedSurface->format->BytesPerPixel);
+        }
         SDL_FreeSurface(loadedSurface);
     }
     
     return optimizedSurface;
+}
+
+void editSurfacePixels(SDL_Surface* surface)
+{
+    int bpp = surface->format->BytesPerPixel;
+    for (int x = 0; x < SCREEN_WIDTH; ++x)
+    {
+        for (int y = 0; y < SCREEN_HEIGHT; ++y)
+        {
+            // TODO: bpp switch
+            Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
+            *p = *p + 100;
+        }
+    }
+
 }
 
 void close()
@@ -101,10 +119,13 @@ int main(int argc, char* args[])
 		else
 		{
 			SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-			
 			SDL_UpdateWindowSurface(gWindow);
-
 			SDL_Delay(2000);
+            
+            editSurfacePixels(gHelloWorld);
+            SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+            SDL_UpdateWindowSurface(gWindow);
+            SDL_Delay(2000);
 		}
 	}
 
