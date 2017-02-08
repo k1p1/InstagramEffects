@@ -1,22 +1,14 @@
+//
+//  sdl.cpp
+//  InstagramEffects
+//
+//  Created by Viktor Ketipov
+//
+
 #include <stdio.h>
-#include <string>
+#include "sdl.h"
 
-#ifdef __APPLE__
-    #include <SDL2/SDL.h>
-    #include <SDL2_image/SDL_image.h>
-#else
-    #include <SDL.h>
-    #include <SDL_image.h>
-#endif
-
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-SDL_Window* gWindow = NULL;
-SDL_Surface* gScreenSurface = NULL;
-SDL_Surface* gHelloWorld = NULL;
-
-bool init()
+bool InitSDL()
 {
 	bool success = true;
 
@@ -77,6 +69,20 @@ SDL_Surface* loadImageToSurface(const char* imageFilePath)
     return optimizedSurface;
 }
 
+bool LoadImage(const char* imageFilePath)
+{
+    bool success = true;
+    
+    gHelloWorld = loadImageToSurface(imageFilePath);
+    if(gHelloWorld == NULL)
+    {
+        printf("Failed to load image!\n");
+        success = false;
+    }
+    
+    return success;
+}
+
 void editSurfacePixels(SDL_Surface* surface)
 {
     int bpp = surface->format->BytesPerPixel;
@@ -92,7 +98,23 @@ void editSurfacePixels(SDL_Surface* surface)
 
 }
 
-void close()
+void EditImagePixels()
+{
+    editSurfacePixels(gHelloWorld);
+}
+
+void UpdateScreen()
+{
+    SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
+    SDL_UpdateWindowSurface(gWindow);
+}
+
+void Wait(int delayInMiliseconds)
+{
+    SDL_Delay(delayInMiliseconds);
+}
+
+void CloseSDL()
 {
 	SDL_FreeSurface(gHelloWorld);
 	gHelloWorld = NULL;
@@ -101,35 +123,4 @@ void close()
 	gWindow = NULL;
 
 	SDL_Quit();
-}
-
-int main(int argc, char* args[])
-{
-	if(!init())
-	{
-		printf("Failed to initialize!\n");
-	}
-	else
-	{
-        gHelloWorld = loadImageToSurface("data/hello_world.png");
-		if(gHelloWorld == NULL)
-		{
-			printf("Failed to load image!\n");
-		}
-		else
-		{
-			SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-			SDL_UpdateWindowSurface(gWindow);
-			SDL_Delay(2000);
-            
-            editSurfacePixels(gHelloWorld);
-            SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-            SDL_UpdateWindowSurface(gWindow);
-            SDL_Delay(2000);
-		}
-	}
-
-	close();
-
-	return 0;
 }
