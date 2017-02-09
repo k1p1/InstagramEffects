@@ -39,4 +39,6 @@ void Wait(int delayInMiliseconds);
 
 void CloseSDL();
 
+int TestSDL();
+
 #endif

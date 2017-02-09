@@ -43,7 +43,7 @@ bool InitSDL()
 	return success;
 }
 
-SDL_Surface* loadImageToSurface(const char* imageFilePath)
+static SDL_Surface* loadImageToSurface(const char* imageFilePath)
 {
     SDL_Surface* optimizedSurface = NULL;
     
@@ -105,8 +105,15 @@ void EditImagePixels()
 
 void UpdateScreen()
 {
-    SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-    SDL_UpdateWindowSurface(gWindow);
+    if(SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL) != 0)
+    {
+        printf("Unable to blit surface! SDL Error: %s\n",  SDL_GetError());
+    }
+    
+    if(SDL_UpdateWindowSurface(gWindow) != 0)
+    {
+        printf("Unable to update window surface! SDL Error: %s\n",  SDL_GetError());
+    }
 }
 
 void Wait(int delayInMiliseconds)
@@ -123,4 +130,31 @@ void CloseSDL()
 	gWindow = NULL;
 
 	SDL_Quit();
+}
+
+int TestSDL()
+{
+    if(!InitSDL())
+    {
+        printf("Failed to initialize SDL!\n");
+        return 1;
+    }
+    
+    if(!LoadImage("data/hello_world.png"))
+    {
+        printf("Failed to load image!\n");
+        return 1;
+    }
+    
+    UpdateScreen();
+    Wait(2000);
+    
+    EditImagePixels();
+    
+    UpdateScreen();
+    Wait(2000);
+    
+    CloseSDL();
+    
+    return 0;
 }
