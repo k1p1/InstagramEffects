@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		D80A04041E486D8A00671711 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80A04031E486D8A00671711 /* SDL2.framework */; };
 		D80A04081E487AAB00671711 /* sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D80A04071E487AAB00671711 /* sdl.cpp */; };
+		D82644621E4C5EF200F5D6C3 /* opencl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D82644611E4C5EF200F5D6C3 /* opencl.cpp */; };
+		D82644651E4C670700F5D6C3 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D82644641E4C670700F5D6C3 /* OpenCL.framework */; };
+		D82644671E4C6A6200F5D6C3 /* kernel.cl in Sources */ = {isa = PBXBuildFile; fileRef = D82644661E4C6A6200F5D6C3 /* kernel.cl */; };
+		D82644691E4C729500F5D6C3 /* helloWorld.cl in Sources */ = {isa = PBXBuildFile; fileRef = D82644681E4C729500F5D6C3 /* helloWorld.cl */; };
 		D8E86D991E49DCA3002A2220 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E86D981E49DCA3002A2220 /* SDL2_image.framework */; };
 		D8FB79551E4B0F5C00129529 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8FB79531E4B0F5C00129529 /* main.cpp */; };
 /* End PBXBuildFile section */
@@ -29,6 +33,11 @@
 		D80A03F61E486C4700671711 /* InstagramEffects */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = InstagramEffects; sourceTree = BUILT_PRODUCTS_DIR; };
 		D80A04031E486D8A00671711 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 		D80A04071E487AAB00671711 /* sdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sdl.cpp; sourceTree = "<group>"; };
+		D82644611E4C5EF200F5D6C3 /* opencl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opencl.cpp; sourceTree = "<group>"; };
+		D82644631E4C65EF00F5D6C3 /* opencl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = opencl.h; sourceTree = "<group>"; };
+		D82644641E4C670700F5D6C3 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = System/Library/Frameworks/OpenCL.framework; sourceTree = SDKROOT; };
+		D82644661E4C6A6200F5D6C3 /* kernel.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = kernel.cl; sourceTree = "<group>"; };
+		D82644681E4C729500F5D6C3 /* helloWorld.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = helloWorld.cl; sourceTree = "<group>"; };
 		D8E86D981E49DCA3002A2220 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		D8FB79531E4B0F5C00129529 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D8FB79541E4B0F5C00129529 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
@@ -40,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D82644651E4C670700F5D6C3 /* OpenCL.framework in Frameworks */,
 				D8E86D991E49DCA3002A2220 /* SDL2_image.framework in Frameworks */,
 				D80A04041E486D8A00671711 /* SDL2.framework in Frameworks */,
 			);
@@ -51,6 +61,7 @@
 		D80A03ED1E486C4700671711 = {
 			isa = PBXGroup;
 			children = (
+				D82644641E4C670700F5D6C3 /* OpenCL.framework */,
 				D8E86D981E49DCA3002A2220 /* SDL2_image.framework */,
 				D80A04031E486D8A00671711 /* SDL2.framework */,
 				D80A03F71E486C4700671711 /* Products */,
@@ -69,10 +80,14 @@
 		D80A04001E486D1300671711 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				D82644681E4C729500F5D6C3 /* helloWorld.cl */,
+				D82644661E4C6A6200F5D6C3 /* kernel.cl */,
 				D80A04071E487AAB00671711 /* sdl.cpp */,
 				D8FB79561E4B10E500129529 /* sdl.h */,
 				D8FB79531E4B0F5C00129529 /* main.cpp */,
 				D8FB79541E4B0F5C00129529 /* main.h */,
+				D82644611E4C5EF200F5D6C3 /* opencl.cpp */,
+				D82644631E4C65EF00F5D6C3 /* opencl.h */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -135,6 +150,9 @@
 			files = (
 				D80A04081E487AAB00671711 /* sdl.cpp in Sources */,
 				D8FB79551E4B0F5C00129529 /* main.cpp in Sources */,
+				D82644621E4C5EF200F5D6C3 /* opencl.cpp in Sources */,
+				D82644671E4C6A6200F5D6C3 /* kernel.cl in Sources */,
+				D82644691E4C729500F5D6C3 /* helloWorld.cl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
