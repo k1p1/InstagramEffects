@@ -9,7 +9,7 @@
 
 int TestGrayscale()
 {
-    int width, height, bytes_per_pixel;
+    int width, height, bits_per_pixel;
     void* inputPixels, *outputPixels;
     
     if(!InitSDL())
@@ -27,11 +27,11 @@ int TestGrayscale()
     UpdateScreen();
     Wait(2000);
 
-    GetScreenSurfaceImageInfo(&width, &height, &bytes_per_pixel, &inputPixels);
-    outputPixels = malloc(sizeof(unsigned int) * width * height * 4);
-    GrayscaleOpenCL(width, height, bytes_per_pixel, inputPixels, outputPixels);
+    GetScreenSurfaceImageInfo(&width, &height, &bits_per_pixel, &inputPixels);
+    outputPixels = malloc(sizeof(unsigned int) * width * height * bits_per_pixel * BITS_IN_A_BYTE);
+    GrayscaleOpenCL(width, height, inputPixels, outputPixels);
     
-    if(!LoadImage(width, height, bytes_per_pixel, outputPixels))
+    if(!LoadImage(width, height, bits_per_pixel, outputPixels))
     {
         printf("Failed to load image from pixels!\n");
         return 1;

@@ -154,7 +154,7 @@ int executeHelloWorldKernel(const float* in, float* out, int count)
     return 0;
 }
 
-int executeGreyscaleKernel(size_t width, size_t height, int pitch, void* inputPixels, void* outputPixels)
+int executeGreyscaleKernel(size_t width, size_t height, void* inputPixels, void* outputPixels)
 {
     cl_int err;
     
@@ -166,8 +166,8 @@ int executeGreyscaleKernel(size_t width, size_t height, int pitch, void* inputPi
     clImageFormat.image_channel_order = CL_RGBA;
     clImageFormat.image_channel_data_type = CL_UNORM_INT8;
 
-    clInputBuffer = clCreateImage2D(context, CL_MEM_READ_ONLY, &clImageFormat, width, height, pitch, 0, &err);
-    clOutputBuffer = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &clImageFormat, width, height, pitch, 0, &err);
+    clInputBuffer = clCreateImage2D(context, CL_MEM_READ_ONLY, &clImageFormat, width, height, 0, 0, &err);
+    clOutputBuffer = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &clImageFormat, width, height, 0, 0, &err);
     if (!clInputBuffer || !clOutputBuffer)
     {
         printf("Error: Failed to allocate device memory! %d\n", err);
@@ -293,7 +293,7 @@ int HelloWorldOpenCL()
     return 0;
 }
 
-int GrayscaleOpenCL(int width, int height, int bits_per_pixel, void* inputPixels, void* outputPixels)
+int GrayscaleOpenCL(int width, int height, void* inputPixels, void* outputPixels)
 {
     int err;
     
@@ -309,7 +309,7 @@ int GrayscaleOpenCL(int width, int height, int bits_per_pixel, void* inputPixels
         return EXIT_FAILURE;
     }
     
-    err = executeGreyscaleKernel(width, height, bits_per_pixel, inputPixels, outputPixels);
+    err = executeGreyscaleKernel(width, height, inputPixels, outputPixels);
     if (err == EXIT_FAILURE)
     {
         return EXIT_FAILURE;

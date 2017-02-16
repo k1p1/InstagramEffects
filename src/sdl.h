@@ -16,6 +16,8 @@
 #include <SDL_image.h>
 #endif
 
+#define BITS_IN_A_BYTE 8
+
 const int WINDOW_SCREEN_WIDTH = 640;
 const int WINDOW_SCREEN_HEIGHT = 480;
 
@@ -33,7 +35,7 @@ bool LoadImage(int width, int height, int bits_per_pixel, void* pixels);
 
 //void editSurfacePixels(SDL_Surface* surface);
 
-void GetScreenSurfaceImageInfo(int* width, int* height, int* pitch, void **pixels);
+void GetScreenSurfaceImageInfo(int* width, int* height, int* bits_per_pixel, void **pixels);
 
 void EditImagePixels();
 
