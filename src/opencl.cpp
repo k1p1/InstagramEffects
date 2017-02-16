@@ -48,7 +48,7 @@ int InitOpenCL()
     return 0;
 }
 
-int executeKernel(const char* kernelFilePath, const char* kernelName, const float* in, float* out, int count)
+int prepareKernel(const char* kernelFilePath, const char* kernelName)
 {
     int err;
     // Load Kernel from file
@@ -94,16 +94,22 @@ int executeKernel(const char* kernelFilePath, const char* kernelName, const floa
         printf("Error: Failed to create compute kernel!\n");
         return EXIT_FAILURE;
     }
+    return 0;
+}
+
+int executeHelloWorldKernel(const float* in, float* out, int count)
+{
+    int err;
     
-    input = clCreateBuffer(context,  CL_MEM_READ_ONLY,  sizeof(float) * count, NULL, NULL);
-    output = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * count, NULL, NULL);
-    if (!in || !out)
+    clInputBuffer = clCreateBuffer(context,  CL_MEM_READ_ONLY,  sizeof(float) * count, NULL, NULL);
+    clOutputBuffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * count, NULL, NULL);
+    if (!clInputBuffer || !clOutputBuffer)
     {
         printf("Error: Failed to allocate device memory!\n");
         return EXIT_FAILURE;
     }
     
-    err = clEnqueueWriteBuffer(command_queue, input, CL_TRUE, 0, sizeof(float) * count, in, 0, NULL, NULL);
+    err = clEnqueueWriteBuffer(command_queue, clInputBuffer, CL_TRUE, 0, sizeof(float) * count, in, 0, NULL, NULL);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to write to source array!\n");
@@ -111,8 +117,8 @@ int executeKernel(const char* kernelFilePath, const char* kernelName, const floa
     }
     
     err = 0;
-    err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &input);
-    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &output);
+    err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clInputBuffer);
+    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &clOutputBuffer);
     err |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &count);
     if (err != CL_SUCCESS)
     {
@@ -138,7 +144,69 @@ int executeKernel(const char* kernelFilePath, const char* kernelName, const floa
     // Wait for commands to finish
     clFinish(command_queue);
     
-    err = clEnqueueReadBuffer( command_queue, output, CL_TRUE, 0, sizeof(float) * count, out, 0, NULL, NULL );
+    err = clEnqueueReadBuffer( command_queue, clOutputBuffer, CL_TRUE, 0, sizeof(float) * count, out, 0, NULL, NULL );
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to read output array! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    return 0;
+}
+
+int executeGreyscaleKernel(size_t width, size_t height, int pitch, void* inputPixels, void* outputPixels)
+{
+    cl_int err;
+    
+    const size_t origin[3] = {0, 0, 0};
+    const size_t region[3] = {width, height, 1};
+    size_t globalSize[2] = {width, height};
+    
+    cl_image_format clImageFormat;
+    clImageFormat.image_channel_order = CL_RGBA;
+    clImageFormat.image_channel_data_type = CL_UNORM_INT8;
+
+    clInputBuffer = clCreateImage2D(context, CL_MEM_READ_ONLY, &clImageFormat, width, height, pitch, 0, &err);
+    clOutputBuffer = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &clImageFormat, width, height, pitch, 0, &err);
+    if (!clInputBuffer || !clOutputBuffer)
+    {
+        printf("Error: Failed to allocate device memory! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = 0;
+    err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clInputBuffer);
+    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &clOutputBuffer);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to set kernel arguments! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueWriteImage(command_queue, clInputBuffer, CL_TRUE, origin, region, width * sizeof(unsigned char) * 4, 0, inputPixels, 0, NULL, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to write image to GPU! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_domain_size), &local_domain_size, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to retrieve kernel work group info! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueNDRangeKernel(command_queue, kernel, 2, 0, globalSize, 0, 0, 0, 0);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to execute kernel!\n");
+        return EXIT_FAILURE;
+    }
+    
+    clFinish(command_queue);
+    
+    err = clEnqueueReadImage(command_queue, clOutputBuffer, true, origin, region, 0, 0, outputPixels, 0, 0, 0);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to read output array! %d\n", err);
@@ -152,13 +220,13 @@ int CleanUpOpenCL()
 {
     int err;
     
-    err = clReleaseMemObject(input);
+    err = clReleaseMemObject(clInputBuffer);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to release memory object! %d\n", err);
         return EXIT_FAILURE;
     }
-    err = clReleaseMemObject(output);
+    err = clReleaseMemObject(clOutputBuffer);
     if (err != CL_SUCCESS)
     {
         printf("Error: Failed to release memory object! %d\n", err);
@@ -192,7 +260,7 @@ int CleanUpOpenCL()
     return 0;
 }
 
-int TestOpenCL()
+int HelloWorldOpenCL()
 {
     int correct = 0;
     int count = 1024*8;
@@ -207,7 +275,8 @@ int TestOpenCL()
     }
     
     InitOpenCL();
-    executeKernel("src/helloWorld.cl", "helloWorld", const_cast<const float*>(dataStart), results, count);
+    prepareKernel("src/helloWorld.cl", "helloWorld");
+    executeHelloWorldKernel(const_cast<const float*>(dataStart), results, count);
     CleanUpOpenCL();
     
     for(i = 0; i < count; i++)
@@ -220,6 +289,39 @@ int TestOpenCL()
     
     printf("Computed '%d/%d' correct values!\n", correct, count);
     
+    
+    return 0;
+}
+
+int GrayscaleOpenCL(int width, int height, int bits_per_pixel, void* inputPixels, void* outputPixels)
+{
+    int err;
+    
+    err = InitOpenCL();
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    err = prepareKernel("src/grayscale.cl", "grayscale");
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    err = executeGreyscaleKernel(width, height, bits_per_pixel, inputPixels, outputPixels);
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    err = CleanUpOpenCL();
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    printf("Grayscale finished successfuly!\n");
     
     return 0;
 }

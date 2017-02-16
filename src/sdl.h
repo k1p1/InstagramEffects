@@ -16,8 +16,8 @@
 #include <SDL_image.h>
 #endif
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int WINDOW_SCREEN_WIDTH = 640;
+const int WINDOW_SCREEN_HEIGHT = 480;
 
 static SDL_Window* gWindow = NULL;
 static SDL_Surface* gScreenSurface = NULL;
@@ -29,7 +29,11 @@ bool InitSDL();
 
 bool LoadImage(const char* imageFilePath);
 
+bool LoadImage(int width, int height, int bits_per_pixel, void* pixels);
+
 //void editSurfacePixels(SDL_Surface* surface);
+
+void GetScreenSurfaceImageInfo(int* width, int* height, int* pitch, void **pixels);
 
 void EditImagePixels();
 

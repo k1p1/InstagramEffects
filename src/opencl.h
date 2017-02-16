@@ -23,8 +23,8 @@ static cl_command_queue command_queue;
 static cl_program program;
 static cl_kernel kernel;
 
-static cl_mem input;
-static cl_mem output;
+static cl_mem clInputBuffer;
+static cl_mem clOutputBuffer;
 
 int InitOpenCL();
 
@@ -32,6 +32,10 @@ int InitOpenCL();
 
 int CleanUpOpenCL();
 
-int TestOpenCL();
+int HelloWorldOpenCL();
+
+int executeGreyscaleKernel(size_t width, size_t height, int pitch, void* inputPixels, void* outputPixels);
+
+int GrayscaleOpenCL(int width, int height, int bits_per_pixel, void* inputPixels, void* outputPixels);
 
 #endif
