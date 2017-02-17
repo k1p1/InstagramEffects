@@ -154,7 +154,7 @@ int executeHelloWorldKernel(const float* in, float* out, int count)
     return 0;
 }
 
-int executeGreyscaleKernel(size_t width, size_t height, void* inputPixels, void* outputPixels)
+int executeImageKernel(size_t width, size_t height, void* inputPixels, void* outputPixels)
 {
     cl_int err;
     
@@ -293,35 +293,23 @@ int HelloWorldOpenCL()
     return 0;
 }
 
-int GrayscaleOpenCL(int width, int height, void* inputPixels, void* outputPixels)
+int RunOpenCLKernel(const char* kernelFilepath, const char* kernalName, int width, int height, void* inputPixels, void* outputPixels)
 {
     int err;
     
-    err = InitOpenCL();
+    err = prepareKernel(kernelFilepath, kernalName);
     if (err == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
     
-    err = prepareKernel("src/grayscale.cl", "grayscale");
+    err = executeImageKernel(width, height, inputPixels, outputPixels);
     if (err == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
     
-    err = executeGreyscaleKernel(width, height, inputPixels, outputPixels);
-    if (err == EXIT_FAILURE)
-    {
-        return EXIT_FAILURE;
-    }
-    
-    err = CleanUpOpenCL();
-    if (err == EXIT_FAILURE)
-    {
-        return EXIT_FAILURE;
-    }
-    
-    printf("Grayscale finished successfuly!\n");
+    printf("OpenCL finished successfuly!\n");
     
     return 0;
 }

@@ -7,10 +7,11 @@
 
 #include "main.h"
 
-int TestGrayscale()
+int TestImageKernel(const char* filepath, const char* kernalName)
 {
     int width, height, bits_per_pixel;
-    void* inputPixels, *outputPixels;
+
+    void *inputPixels, *outputPixels;
     
     if(!InitSDL())
     {
@@ -25,22 +26,56 @@ int TestGrayscale()
     }
 
     UpdateScreen();
-    Wait(2000);
+    Wait(1000);
+    
+    if (InitOpenCL() == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
 
     GetScreenSurfaceImageInfo(&width, &height, &bits_per_pixel, &inputPixels);
     outputPixels = malloc(sizeof(unsigned int) * width * height * bits_per_pixel * BITS_IN_A_BYTE);
-    GrayscaleOpenCL(width, height, inputPixels, outputPixels);
+    
+    RunOpenCLKernel(filepath, kernalName, width, height, inputPixels, outputPixels);
     
     if(!LoadImage(width, height, bits_per_pixel, outputPixels))
     {
         printf("Failed to load image from pixels!\n");
         return 1;
     }
-
+    
+    UpdateScreen();
+    Wait(2000);
+   
+    if(!LoadImage(width, height, bits_per_pixel, inputPixels))
+    {
+        printf("Failed to load image from pixels!\n");
+        return 1;
+    }
+    
+    UpdateScreen();
+    Wait(1000);
+    
+    RunOpenCLKernel("src/brightness.cl", "brightness", width, height, inputPixels, outputPixels);
+    
+    if(!LoadImage(width, height, bits_per_pixel, outputPixels))
+    {
+        printf("Failed to load image from pixels!\n");
+        return 1;
+    }
+    
     UpdateScreen();
     Wait(2000);
 
+    
+    if (CleanUpOpenCL() == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
     CloseSDL();
+    
+    free(outputPixels);
 
     return 0;
 }
@@ -49,7 +84,8 @@ int main(int argc, char* args[])
 {
     //TestSDL();
     //HelloWorldOpenCL();
-    TestGrayscale();
+    TestImageKernel("src/grayscale.cl", "grayscale");
+    //TestImageKernel("src/brightness.cl", "brightness");
     
     return 0;
 }

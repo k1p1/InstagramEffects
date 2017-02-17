@@ -34,8 +34,8 @@ int CleanUpOpenCL();
 
 int HelloWorldOpenCL();
 
-//int executeGreyscaleKernel(size_t width, size_t height, void* inputPixels, void* outputPixels);
+//int executeImageKernelKernel(size_t width, size_t height, void* inputPixels, void* outputPixels);
 
-int GrayscaleOpenCL(int width, int height, void* inputPixels, void* outputPixels);
+int RunOpenCLKernel(const char* kernelFilepath, const char* kernalName, int width, int height, void* inputPixels, void* outputPixels);
 
 #endif

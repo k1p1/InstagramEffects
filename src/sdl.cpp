@@ -56,16 +56,11 @@ SDL_Surface* loadImageToSurface(const char* imageFilePath)
 
 SDL_Surface* loadImageToSurface(int width, int height, int bits_per_pixel, void* pixels)
 {
-    SDL_Surface* loadedSurface = SDL_CreateRGBSurface(0, width, height, bits_per_pixel, 0, 0, 0, 0); //default masks
+    int pitch = width * bits_per_pixel / BITS_IN_A_BYTE;
+    SDL_Surface* loadedSurface = SDL_CreateRGBSurfaceFrom(pixels, width, height, bits_per_pixel, pitch, 0, 0, 0, 0); //default masks
     if(loadedSurface == NULL)
     {
         printf("Unable to load image %p! SDL_image Error: %s\n", pixels, IMG_GetError());
-    }
-    else
-    {
-        void* old_pixels = loadedSurface->pixels;
-        loadedSurface->pixels = pixels;
-        free(old_pixels);
     }
     
     return loadedSurface;
@@ -90,59 +85,37 @@ SDL_Surface* optimizeSurface(SDL_Surface* oldSurface)
 }
 
 bool LoadImage(const char* imageFilePath)
-{
-    SDL_Surface* newSurface = NULL;
-    bool success = true;
-    
-    newSurface = loadImageToSurface(imageFilePath);
-    if(newSurface == NULL)
+{    
+    gHelloWorld = loadImageToSurface(imageFilePath);
+    if(gHelloWorld == NULL)
     {
-        success = false;
+        return false;
     }
-    else
-    {
-        gHelloWorld = optimizeSurface(newSurface);
-        if (gHelloWorld == NULL)
-        {
-            success = false;
-        }
-        
-    }
-    
-    return success;
+
+    printf("Image %s loaded successfuly!\n", imageFilePath);
+    return true;
 }
 
 bool LoadImage(int width, int height, int bits_per_pixel, void* pixels)
 {
-    SDL_Surface* newSurface = NULL;
-    bool success = true;
-    
-    newSurface = loadImageToSurface(width, height, bits_per_pixel, pixels);
-    if(newSurface == NULL)
+    gHelloWorld = loadImageToSurface(width, height, bits_per_pixel, pixels);
+    if(gHelloWorld == NULL)
     {
-        success = false;
+        return false;
     }
-    else
-    {
-        gHelloWorld = optimizeSurface(newSurface);
-        if (gHelloWorld == NULL)
-        {
-            success = false;
-        }
-        
-    }
-    
-    return success;
+
+    printf("Image from pixels loaded successfuly!\n");
+    return true;
 }
 
 void GetScreenSurfaceImageInfo(int* width, int* height, int* bits_per_pixel, void **pixels)
 {
-    char* cPixels = (char*)gScreenSurface->pixels;
+    char* cPixels = (char*)gHelloWorld->pixels;
     *pixels = cPixels;
     
-    *width  = gScreenSurface->w;
-    *height = gScreenSurface->h;
-    *bits_per_pixel  = gScreenSurface->format->BitsPerPixel;
+    *width  = gHelloWorld->w;
+    *height = gHelloWorld->h;
+    *bits_per_pixel  = gHelloWorld->format->BitsPerPixel;
 }
 
 void editSurfacePixels(SDL_Surface* surface)
@@ -175,6 +148,8 @@ void UpdateScreen()
     {
         printf("Unable to update window surface! SDL Error: %s\n",  SDL_GetError());
     }
+    
+    printf("Screen updated!\n");
 }
 
 void Wait(int delayInMiliseconds)
