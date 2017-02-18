@@ -216,6 +216,92 @@ int executeImageKernel(size_t width, size_t height, void* inputPixels, void* out
     return 0;
 }
 
+int executeConvolutionKernel(size_t width, size_t height, void* inputPixels, void* outputPixels, convolutionFilter filter)
+{
+    cl_int err;
+    
+    const size_t origin[3] = {0, 0, 0};
+    const size_t region[3] = {width, height, 1};
+    size_t globalSize[2] = {width, height};
+    
+    cl_image_format clImageFormat;
+    clImageFormat.image_channel_order = CL_RGBA;
+    clImageFormat.image_channel_data_type = CL_UNORM_INT8;
+    
+    for(int i = 0; i < filter.size * filter.size; i++)
+    {
+        printf("%f ", filter.data[i]);
+    }
+    printf("\n");
+    
+    clInputBuffer = clCreateImage2D(context, CL_MEM_READ_ONLY, &clImageFormat, width, height, 0, 0, &err);
+    clOutputBuffer = clCreateImage2D(context, CL_MEM_WRITE_ONLY, &clImageFormat, width, height, 0, 0, &err);
+    clFilterBuffer = clCreateBuffer(context,  CL_MEM_READ_ONLY,  sizeof(float) * filter.size * filter.size, NULL, NULL);
+    clFilterSize = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(int), NULL, NULL);
+    if (!clInputBuffer || !clOutputBuffer || !clFilterBuffer || !clFilterSize)
+    {
+        printf("Error: Failed to allocate device memory!\n");
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueWriteImage(command_queue, clInputBuffer, CL_TRUE, origin, region, width * sizeof(unsigned char) * 4, 0, inputPixels, 0, NULL, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to write image to GPU! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueWriteBuffer(command_queue, clFilterBuffer, CL_TRUE, 0, sizeof(float) * filter.size * filter.size, filter.data, 0, NULL, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to write to source array!\n");
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueWriteBuffer(command_queue, clFilterSize, CL_TRUE, 0, sizeof(int), &filter.size, 0, NULL, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to write to source array!\n");
+        return EXIT_FAILURE;
+    }
+    
+    err = 0;
+    err  = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clInputBuffer);
+    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &clOutputBuffer);
+    err |= clSetKernelArg(kernel, 2, sizeof(float*), &clFilterBuffer);
+    err |= clSetKernelArg(kernel, 3, sizeof(int*),   &clFilterSize);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to set kernel arguments! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_domain_size), &local_domain_size, NULL);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to retrieve kernel work group info! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    err = clEnqueueNDRangeKernel(command_queue, kernel, 2, 0, globalSize, 0, 0, 0, 0);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to execute kernel!\n");
+        return EXIT_FAILURE;
+    }
+    
+    clFinish(command_queue);
+    
+    err = clEnqueueReadImage(command_queue, clOutputBuffer, true, origin, region, 0, 0, outputPixels, 0, 0, 0);
+    if (err != CL_SUCCESS)
+    {
+        printf("Error: Failed to read output array! %d\n", err);
+        return EXIT_FAILURE;
+    }
+    
+    return 0;
+}
+
 int CleanUpOpenCL()
 {
     int err;
@@ -304,6 +390,27 @@ int RunOpenCLKernel(const char* kernelFilepath, const char* kernalName, int widt
     }
     
     err = executeImageKernel(width, height, inputPixels, outputPixels);
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    printf("OpenCL finished successfuly!\n");
+    
+    return 0;
+}
+
+int RunConvolutionOpenCLKernel(int width, int height, void* inputPixels, void* outputPixels, convolutionFilter filter)
+{
+    int err;
+    
+    err = prepareKernel("src/convolution.cl", "convolution");
+    if (err == EXIT_FAILURE)
+    {
+        return EXIT_FAILURE;
+    }
+    
+    err = executeConvolutionKernel(width, height, inputPixels, outputPixels, filter);
     if (err == EXIT_FAILURE)
     {
         return EXIT_FAILURE;

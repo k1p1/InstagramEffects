@@ -14,6 +14,7 @@
 		D82644691E4C729500F5D6C3 /* helloWorld.cl in Sources */ = {isa = PBXBuildFile; fileRef = D82644681E4C729500F5D6C3 /* helloWorld.cl */; };
 		D8738C231E4DB4F200D4EADE /* grayscale.cl in Sources */ = {isa = PBXBuildFile; fileRef = D8738C221E4DB4F200D4EADE /* grayscale.cl */; };
 		D8BF5E561E586A9A00A47C5C /* threshold.cl in Sources */ = {isa = PBXBuildFile; fileRef = D8BF5E551E586A9A00A47C5C /* threshold.cl */; };
+		D8BF5E5A1E5897B400A47C5C /* convolution.cl in Sources */ = {isa = PBXBuildFile; fileRef = D8BF5E591E5897B400A47C5C /* convolution.cl */; };
 		D8E72FBD1E55C8AB00228A71 /* brightness.cl in Sources */ = {isa = PBXBuildFile; fileRef = D8E72FBC1E55C8AB00228A71 /* brightness.cl */; };
 		D8E86D991E49DCA3002A2220 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E86D981E49DCA3002A2220 /* SDL2_image.framework */; };
 		D8FB79551E4B0F5C00129529 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8FB79531E4B0F5C00129529 /* main.cpp */; };
@@ -41,6 +42,7 @@
 		D82644681E4C729500F5D6C3 /* helloWorld.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = helloWorld.cl; sourceTree = "<group>"; };
 		D8738C221E4DB4F200D4EADE /* grayscale.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = grayscale.cl; sourceTree = "<group>"; };
 		D8BF5E551E586A9A00A47C5C /* threshold.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = threshold.cl; sourceTree = "<group>"; };
+		D8BF5E591E5897B400A47C5C /* convolution.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = convolution.cl; sourceTree = "<group>"; };
 		D8E72FBC1E55C8AB00228A71 /* brightness.cl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.opencl; path = brightness.cl; sourceTree = "<group>"; };
 		D8E86D981E49DCA3002A2220 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		D8FB79531E4B0F5C00129529 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 		D80A04001E486D1300671711 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				D8BF5E591E5897B400A47C5C /* convolution.cl */,
 				D8E72FBC1E55C8AB00228A71 /* brightness.cl */,
 				D8738C221E4DB4F200D4EADE /* grayscale.cl */,
 				D8BF5E551E586A9A00A47C5C /* threshold.cl */,
@@ -160,6 +163,7 @@
 				D8E72FBD1E55C8AB00228A71 /* brightness.cl in Sources */,
 				D8BF5E561E586A9A00A47C5C /* threshold.cl in Sources */,
 				D82644621E4C5EF200F5D6C3 /* opencl.cpp in Sources */,
+				D8BF5E5A1E5897B400A47C5C /* convolution.cl in Sources */,
 				D82644691E4C729500F5D6C3 /* helloWorld.cl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

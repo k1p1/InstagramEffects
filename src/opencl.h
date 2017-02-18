@@ -25,6 +25,14 @@ static cl_kernel kernel;
 
 static cl_mem clInputBuffer;
 static cl_mem clOutputBuffer;
+static cl_mem clFilterBuffer;
+static cl_mem clFilterSize;
+
+typedef struct
+{
+    float* data;
+    int size;
+}convolutionFilter;
 
 int InitOpenCL();
 
@@ -37,5 +45,7 @@ int HelloWorldOpenCL();
 //int executeImageKernelKernel(size_t width, size_t height, void* inputPixels, void* outputPixels);
 
 int RunOpenCLKernel(const char* kernelFilepath, const char* kernalName, int width, int height, void* inputPixels, void* outputPixels);
+
+int RunConvolutionOpenCLKernel(int width, int height, void* inputPixels, void* outputPixels, convolutionFilter filter);
 
 #endif
