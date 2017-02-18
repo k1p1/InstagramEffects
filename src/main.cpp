@@ -84,8 +84,10 @@ int main(int argc, char* args[])
 {
     //TestSDL();
     //HelloWorldOpenCL();
-    TestImageKernel("src/grayscale.cl", "grayscale");
+    //TestImageKernel("src/grayscale.cl", "grayscale");
     //TestImageKernel("src/brightness.cl", "brightness");
+    
+    TestImageKernel("src/threshold.cl", "threshold");
     
     return 0;
 }
